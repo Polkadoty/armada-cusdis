@@ -1,4 +1,4 @@
-FROM node:16-alpine3.15 as builder
+FROM node:20-alpine as builder
 
 VOLUME [ "/data" ]
 
@@ -9,15 +9,15 @@ RUN apk add --no-cache python3 py3-pip make gcc g++
 
 COPY . /app
 
-COPY package.json yarn.lock /app/
+COPY package.json /app/
 
 WORKDIR /app
 
 RUN npm install -g pnpm
-RUN yarn install --frozen-lockfile && npx browserslist@latest --update-db
+RUN pnpm install
 RUN npm run build:without-migrate
 
-FROM node:16-alpine3.15 as runner
+FROM node:20-alpine as runner
 
 ENV NODE_ENV=production
 ARG DB_TYPE=sqlite
